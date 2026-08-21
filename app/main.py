@@ -4,6 +4,7 @@ from sqlalchemy import text
 from app.db.database import Base, engine, get_db
 from app.models import user, project, project_members, task
 from app.core.exceptions import AppException, app_exception_handler
+from app.routers import auth
 
 Base.metadata.create_all(bind=engine)
 
