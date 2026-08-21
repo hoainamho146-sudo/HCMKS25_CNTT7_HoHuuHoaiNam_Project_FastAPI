@@ -4,7 +4,7 @@ from sqlalchemy import text
 from app.db.database import Base, engine, get_db
 from app.models import user, project, project_members, task
 from app.core.exceptions import AppException, app_exception_handler
-from app.routers import auth
+from app.routers import auth, users
 
 Base.metadata.create_all(bind=engine)
 
@@ -15,15 +15,16 @@ app = FastAPI(
 
 app.add_exception_handler(AppException, app_exception_handler)
 
+app.include_router(auth.router)
+app.include_router(users.router)
+
 @app.get("/")
 def root():
     return {"message": "Khởi tạo thành công"}
 
 @app.get("/health", status_code=status.HTTP_200_OK, tags=["Health Check"])
 def health_check(db: Session = Depends(get_db)):
-    """
-    Health check endpoint: Kiểm tra trạng thái hoạt động của API và kết nối Database.
-    """
+    # Kiểm tra trạng thái hoạt động của API và kết nối Database.
     try:
         db.execute(text("SELECT 1"))
         return {
