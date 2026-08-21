@@ -34,13 +34,14 @@ def authenticate_user(db: Session, user_data: UserLogin) -> User:
 
     if not user or not verify_password(user_data.password, user.password_hash):
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Email hoặc mật khẩu không chính xác"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Email hoặc mật khẩu không chính xác",
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
     if not user.is_active:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Tài khoản đã bị khóa"
         )
 
