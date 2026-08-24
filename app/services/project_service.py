@@ -23,3 +23,15 @@ def create_project(db: Session, project_data: ProjectCreate, user_id: int) -> Pr
     db.refresh(new_project)
     
     return new_project
+
+def get_user_projects(db: Session, user_id: int, search: str | None = None) -> list[Project]:
+    query = (
+        db.query(Project)
+        .join(ProjectMember, Project.id == ProjectMember.project_id)
+        .filter(ProjectMember.user_id == user_id)
+    )
+
+    if search:
+        query = query.filter(Project.name.ilike(f"%{search.strip()}%"))
+
+    return query.distinct().all()
