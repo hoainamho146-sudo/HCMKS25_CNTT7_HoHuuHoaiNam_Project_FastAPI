@@ -180,3 +180,12 @@ def remove_member_from_project(
 
     db.delete(member_to_remove)
     db.commit()
+
+def get_project_members(db: Session, project_id: int, current_user_id: int) -> list[ProjectMember]:
+    get_project_by_id(db=db, project_id=project_id, user_id=current_user_id)
+
+    return (
+        db.query(ProjectMember)
+        .filter(ProjectMember.project_id == project_id)
+        .all()
+    )

@@ -107,3 +107,19 @@ def remove_member(
         current_user_id=current_user.id,
     )
     return None
+
+@router.get(
+    "/{project_id}/members",
+    response_model=list[ProjectMemberResponse],
+    status_code=status.HTTP_200_OK,
+)
+def list_project_members(
+    project_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    return project_service.get_project_members(
+        db=db,
+        project_id=project_id,
+        current_user_id=current_user.id,
+    )
