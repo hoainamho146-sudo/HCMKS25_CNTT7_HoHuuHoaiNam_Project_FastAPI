@@ -89,3 +89,21 @@ def add_member_to_project(
         member_data=member_data,
         current_user_id=current_user.id
     )
+
+@router.delete(
+    "/{project_id}/members/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def remove_member(
+    project_id: int,
+    user_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    project_service.remove_member_from_project(
+        db=db,
+        project_id=project_id,
+        target_user_id=user_id,
+        current_user_id=current_user.id,
+    )
+    return None

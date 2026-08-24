@@ -143,3 +143,40 @@ def add_member_to_project(
     db.refresh(new_member)
 
     return new_member
+
+def remove_member_from_project(
+    db: Session, project_id: int, target_user_id: int, current_user_id: int
+) -> None:
+    check_project_owner(db=db, project_id=project_id, user_id=current_user_id)
+
+    member_to_remove = (
+        db.query(ProjectMember)
+        .filter(
+            ProjectMember.project_id == project_id,
+            ProjectMember.user_id == target_user_id,
+        )
+        .first()
+    )
+    if not member_to_remove:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Thành viên không tồn tại trong dự án này",
+        )
+
+    if member_to_remove.role == "OWNER":
+        owner_count = (
+            db.query(ProjectMember)
+            .filter(
+                ProjectMember.project_id == project_id,
+                ProjectMember.role == "OWNER",
+            )
+            .count()
+        )
+        if owner_count <= 1:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Không thể xóa OWNER duy nhất còn lại của dự án",
+            )
+
+    db.delete(member_to_remove)
+    db.commit()
