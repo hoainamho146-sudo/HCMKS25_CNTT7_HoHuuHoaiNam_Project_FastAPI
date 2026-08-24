@@ -4,6 +4,7 @@ from app.db.database import get_db
 from app.core.dependencies import get_current_user
 from app.models.user import User
 from app.schemas.project import ProjectCreate, ProjectResponse, ProjectUpdate
+from app.schemas.project_members import ProjectMemberCreate, ProjectMemberResponse
 from app.services import project_service
 
 router = APIRouter(
@@ -74,3 +75,17 @@ def delete_existing_project(
         user_id=current_user.id
     )
     return None
+
+@router.post("/{project_id}/members", response_model=ProjectMemberResponse, status_code=status.HTTP_201_CREATED)
+def add_member_to_project(
+    project_id: int,
+    member_data: ProjectMemberCreate,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return project_service.add_member_to_project(
+        db=db,
+        project_id=project_id,
+        member_data=member_data,
+        current_user_id=current_user.id
+    )

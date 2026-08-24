@@ -2,7 +2,9 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.project import Project
 from app.models.project_members import ProjectMember
+from app.models.user import User
 from app.schemas.project import ProjectCreate, ProjectUpdate
+from app.schemas.project_members import ProjectMemberCreate
 
 def create_project(db: Session, project_data: ProjectCreate, user_id: int) -> Project:
     new_project = Project(
@@ -104,3 +106,40 @@ def delete_project(db: Session, project_id: int, user_id: int) -> None:
     
     db.delete(project)
     db.commit()
+
+def add_member_to_project(
+    db: Session, project_id: int, member_data: ProjectMemberCreate, current_user_id: int
+) -> ProjectMember:
+    check_project_owner(db=db, project_id=project_id, user_id=current_user_id)
+
+    target_user = db.query(User).filter(User.id == member_data.user_id).first()
+    if not target_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Người dùng được thêm không tồn tại"
+        )
+
+    existing_member = (
+        db.query(ProjectMember)
+        .filter(
+            ProjectMember.project_id == project_id,
+            ProjectMember.user_id == member_data.user_id
+        )
+        .first()
+    )
+    if existing_member:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Người dùng này đã là thành viên của dự án"
+        )
+
+    new_member = ProjectMember(
+        project_id=project_id,
+        user_id=member_data.user_id,
+        role=member_data.role.upper()
+    )
+    db.add(new_member)
+    db.commit()
+    db.refresh(new_member)
+
+    return new_member

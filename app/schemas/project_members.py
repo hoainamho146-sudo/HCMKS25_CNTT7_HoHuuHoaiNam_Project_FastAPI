@@ -5,7 +5,6 @@ class ProjectMemberBase(BaseModel):
     role: str
 
 class ProjectMemberCreate(ProjectMemberBase):
-    project_id: int
     user_id: int
 
 class ProjectMemberUpdate(BaseModel):
