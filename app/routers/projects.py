@@ -34,3 +34,15 @@ def list_projects(
         user_id=current_user.id,
         search=search
     )
+
+@router.get("/{project_id}", response_model=ProjectResponse, status_code=status.HTTP_200_OK)
+def get_project_detail(
+    project_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return project_service.get_project_by_id(
+        db=db,
+        project_id=project_id,
+        user_id=current_user.id
+    )

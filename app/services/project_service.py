@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from fastapi import HTTPException, status
 from app.models.project import Project
 from app.models.project_members import ProjectMember
 from app.schemas.project import ProjectCreate
@@ -35,3 +36,28 @@ def get_user_projects(db: Session, user_id: int, search: str | None = None) -> l
         query = query.filter(Project.name.ilike(f"%{search.strip()}%"))
 
     return query.distinct().all()
+
+def get_project_by_id(db: Session, project_id: int, user_id: int) -> Project:
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Dự án không tồn tại"
+        )
+
+    is_member = (
+        db.query(ProjectMember)
+        .filter(
+            ProjectMember.project_id == project_id,
+            ProjectMember.user_id == user_id
+        )
+        .first()
+    )
+
+    if not is_member:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Quyền truy cập bị từ chối! Bạn không phải là thành viên của dự án này"
+        )
+
+    return project
