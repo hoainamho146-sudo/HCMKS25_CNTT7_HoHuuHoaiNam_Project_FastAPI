@@ -6,7 +6,7 @@ class ProjectBase(BaseModel):
     description: str | None = None
 
 class ProjectCreate(ProjectBase):
-    owner_id: int
+    pass
 
 class ProjectUpdate(BaseModel):
     name: str | None = None

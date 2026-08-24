@@ -5,6 +5,7 @@ from app.db.database import Base, engine, get_db
 from app.models import user, project, project_members, task
 from app.core.exceptions import AppException, app_exception_handler
 from app.routers import auth, users
+from app.routers import auth, users, projects
 
 Base.metadata.create_all(bind=engine)
 
@@ -17,6 +18,7 @@ app.add_exception_handler(AppException, app_exception_handler)
 
 app.include_router(auth.router)
 app.include_router(users.router)
+app.include_router(projects.router)
 
 @app.get("/")
 def root():
