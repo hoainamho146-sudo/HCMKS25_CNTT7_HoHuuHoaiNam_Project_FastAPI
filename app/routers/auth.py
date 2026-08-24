@@ -19,7 +19,7 @@ def register(user_data: UserCreate, db: Session = Depends(get_db)):
 @router.post("/login", status_code=status.HTTP_200_OK)
 def login(user_data: UserLogin, db: Session = Depends(get_db)):
     user = auth_service.authenticate_user(db=db, user_data=user_data)
-    role_name = user.role.name if hasattr(user.role, "name") else user.role
+    role_name = user.role
 
     access_token = create_access_token(data={"sub": user.email, "id": user.id, "role": role_name})
 

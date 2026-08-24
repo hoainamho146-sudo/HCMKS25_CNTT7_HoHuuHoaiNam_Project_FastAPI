@@ -1,6 +1,7 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import relationship
 from app.db.database import Base
+from datetime import datetime, timezone
 
 class User(Base):
     __tablename__ = "users"
@@ -11,7 +12,7 @@ class User(Base):
     full_name = Column(String(255), nullable=False)
     role = Column(String(50), default = "USER")
     is_active = Column(Boolean, default = True)
-    created_at = Column(DateTime, nullable=False)
+    created_at = Column(DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     projects = relationship("Project", back_populates="owner")
     project_members = relationship("ProjectMember", back_populates="user")

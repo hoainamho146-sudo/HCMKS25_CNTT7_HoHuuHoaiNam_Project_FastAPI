@@ -18,7 +18,7 @@ def create_user(db: Session, user_data: UserCreate) -> User:
         email=user_data.email,
         password_hash=hashed_pwd,
         full_name=user_data.full_name,
-        role=user_data.role if hasattr(user_data, "role") and user_data.role else "USER",
+        role=user_data.role or "USER",
         is_active=True
     )
 

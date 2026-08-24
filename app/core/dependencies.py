@@ -55,15 +55,10 @@ async def get_current_user(
 
 class RoleChecker:
     def __init__(self, allowed_roles: list[str]):
-        self.allowed_roles = [r.upper() for r in allowed_roles]
+        self.allowed_roles = allowed_roles
 
     def __call__(self, current_user: User = Depends(get_current_user)):
-        if hasattr(current_user.role, "name"):
-            user_role_name = current_user.role.name
-        elif hasattr(current_user.role, "value"):
-            user_role_name = current_user.role.value
-        else:
-            user_role_name = str(current_user.role) if current_user.role else ""
+        user_role_name = current_user.role.value
 
         if user_role_name.upper() not in self.allowed_roles:
             raise HTTPException(

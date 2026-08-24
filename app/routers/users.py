@@ -14,13 +14,12 @@ router = APIRouter(
 
 @router.get("/me", response_model=UserResponse)
 def get_me(current_user: User = Depends(get_current_user)):
-    """Trả thông tin người dùng đang đăng nhập (ẩn password_hash qua UserResponse)"""
     return current_user
 
 @router.get("", response_model=List[UserResponse])
 def get_users(
-    search: Optional[str] = Query(None, description="Tìm kiếm theo tên hoặc email"),
-    is_active: Optional[bool] = Query(None, description="Lọc theo trạng thái hoạt động"),
+    search: str = Query(None, description="Tìm kiếm theo tên hoặc email"),
+    is_active: bool = Query(None, description="Lọc theo trạng thái hoạt động"),
     db: Session = Depends(get_db),
     current_admin: User = Depends(RoleChecker(["ADMIN"]))
 ):
